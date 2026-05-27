@@ -1,0 +1,58 @@
+# Unity generated folders
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+
+# Unity generated files
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.csproj
+*.unityproj
+*.sln
+*.slnx
+*.user
+*.userprefs
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+sysinfo.txt
+
+# Visual Studio / Rider / VS Code
+.vs/
+.vscode/
+.idea/
+.dotnet/
+*.suo
+*.tmp
+*.userosscache
+*.sln.docstates
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Crash reports and diagnostics
+*.stackdump
+crashlytics-build.properties
+Assets/_Recovery/
+Assets/_Recovery.meta
+
+# Asset Store tools often regenerate these
+Assets/AssetStoreTools*
+
+# Firebase and dependency resolver generated Android outputs
+Assets/GeneratedLocalRepo/
+Assets/GeneratedLocalRepo.meta
+Assets/StreamingAssets/google-services-desktop.json
+Assets/StreamingAssets/google-services-desktop.json.meta

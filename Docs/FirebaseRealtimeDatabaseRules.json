@@ -1,0 +1,18 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid == $uid",
+        ".write": "auth != null && auth.uid == $uid"
+      }
+    },
+    "leaderboards": {
+      "$board": {
+        ".read": "auth != null",
+        "$uid": {
+          ".write": "auth != null && auth.uid == $uid"
+        }
+      }
+    }
+  }
+}

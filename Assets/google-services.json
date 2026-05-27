@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "269160501219",
+    "firebase_url": "https://farmsim-90a19-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "farmsim-90a19",
+    "storage_bucket": "farmsim-90a19.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:269160501219:android:99ad3fbcefe6e77429dad6",
+        "android_client_info": {
+          "package_name": "com.shp3k.FarmSim"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_e0qiRMX6BAGsjvMx6WkcXax8z5KwBNs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
