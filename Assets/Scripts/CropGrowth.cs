@@ -271,6 +271,16 @@ public class CropGrowth : MonoBehaviour
         }
 
         visualController.SetStage(currentStage);
+        RealignToPlotSpawnPoint();
+    }
+
+    private void RealignToPlotSpawnPoint()
+    {
+        FarmPlot ownerPlot = GetComponentInParent<FarmPlot>();
+        if (ownerPlot != null)
+        {
+            ownerPlot.RealignPlantToSpawnPoint(gameObject);
+        }
     }
 
     private void SetReadyToHarvest(bool ready)

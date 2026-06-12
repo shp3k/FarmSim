@@ -185,6 +185,22 @@ public class FarmPlot : MonoBehaviour
         plantedItemId = data.plantedItemId;
     }
 
+    public void RealignPlantToSpawnPoint(GameObject plantedObject)
+    {
+        if (plantedObject == null)
+        {
+            return;
+        }
+
+        AlignPlantVisualBottomToSpawnPoint(plantedObject, GetResolvedSpawnPoint());
+
+        PlantHarvestClickHandler clickHandler = plantedObject.GetComponent<PlantHarvestClickHandler>();
+        if (clickHandler != null)
+        {
+            clickHandler.RefreshClickColliderFromVisuals();
+        }
+    }
+
     private void ClearPlotInternal()
     {
         if (currentPlantObject != null)

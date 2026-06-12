@@ -19,6 +19,7 @@ using System.Net.Http;
 using System.Net.WebSockets;
 using System.Reflection;
 using System.Threading.Tasks;
+using Firebase;
 
 namespace Firebase.Internal
 {
