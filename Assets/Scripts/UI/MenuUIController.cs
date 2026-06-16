@@ -94,7 +94,7 @@ public class MenuUIController : MonoBehaviour
     public void Play()
     {
         FirebaseAuthService auth = FirebaseAuthService.Instance;
-        if (auth != null && !auth.IsSignedIn())
+        if (auth != null && !auth.HasActiveSession())
         {
             SceneTransitionManager.LoadScene(authSceneName);
             return;

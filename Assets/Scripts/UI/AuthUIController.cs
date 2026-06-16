@@ -79,6 +79,7 @@ public class AuthUIController : MonoBehaviour
 
     [Header("Buttons")]
     [SerializeField] private Button loginButton;
+    [SerializeField] private Button guestButton;
     [SerializeField] private Button registerButton;
     [SerializeField] private Button switchToRegisterButton;
     [SerializeField] private Button switchToLoginButton;
@@ -101,6 +102,7 @@ public class AuthUIController : MonoBehaviour
     private void OnDestroy()
     {
         if (loginButton != null) loginButton.onClick.RemoveListener(HandleLoginClicked);
+        if (guestButton != null) guestButton.onClick.RemoveListener(HandleGuestClicked);
         if (registerButton != null) registerButton.onClick.RemoveListener(HandleRegisterClicked);
         if (switchToRegisterButton != null) switchToRegisterButton.onClick.RemoveListener(ShowRegister);
         if (switchToLoginButton != null) switchToLoginButton.onClick.RemoveListener(ShowLogin);
@@ -135,6 +137,11 @@ public class AuthUIController : MonoBehaviour
     private async Task<RestoreSessionResult> CheckRestoredSession()
     {
         await authService.InitializeAuth();
+        if (authService.IsGuestSession)
+        {
+            return RestoreSessionResult.Ready();
+        }
+
         if (!authService.IsSignedIn())
         {
             return RestoreSessionResult.NotSignedIn();
@@ -204,6 +211,20 @@ public class AuthUIController : MonoBehaviour
         SceneTransitionManager.LoadScene(menuSceneName);
     }
 
+    private void HandleGuestClicked()
+    {
+        SetBusy(true, "\u0412\u0445\u043e\u0434 \u043a\u0430\u043a \u0433\u043e\u0441\u0442\u044c...");
+        AuthResultData result = authService.LoginAsGuest();
+        if (!result.Success)
+        {
+            SetBusy(false, result.Message);
+            return;
+        }
+
+        SetStatus("\u0413\u043e\u0441\u0442\u0435\u0432\u043e\u0439 \u0440\u0435\u0436\u0438\u043c \u0432\u043a\u043b\u044e\u0447\u0435\u043d.");
+        SceneTransitionManager.LoadScene(menuSceneName);
+    }
+
     private async void HandleRegisterClicked()
     {
         SetBusy(true, "\u0420\u0435\u0433\u0438\u0441\u0442\u0440\u0430\u0446\u0438\u044f...");
@@ -250,6 +271,7 @@ public class AuthUIController : MonoBehaviour
     private void HookButtons()
     {
         if (loginButton != null) loginButton.onClick.AddListener(HandleLoginClicked);
+        if (guestButton != null) guestButton.onClick.AddListener(HandleGuestClicked);
         if (registerButton != null) registerButton.onClick.AddListener(HandleRegisterClicked);
         if (switchToRegisterButton != null) switchToRegisterButton.onClick.AddListener(ShowRegister);
         if (switchToLoginButton != null) switchToLoginButton.onClick.AddListener(ShowLogin);
@@ -264,6 +286,7 @@ public class AuthUIController : MonoBehaviour
     private void SetBusy(bool busy, string message)
     {
         if (loginButton != null) loginButton.interactable = !busy;
+        if (guestButton != null) guestButton.interactable = !busy;
         if (registerButton != null) registerButton.interactable = !busy;
         if (switchToRegisterButton != null) switchToRegisterButton.interactable = !busy;
         if (switchToLoginButton != null) switchToLoginButton.interactable = !busy;
@@ -493,6 +516,7 @@ public class AuthUIController : MonoBehaviour
     public void EnsureUi()
     {
         FindExistingUiReferences();
+        EnsureGuestButton();
 
         if (loginPanel != null && registerPanel != null)
         {
@@ -532,6 +556,7 @@ public class AuthUIController : MonoBehaviour
         passwordInput = CreateInput(loginPanel.transform, "Password", true);
         loginButton = CreateButton(loginPanel.transform, "\u0412\u043e\u0439\u0442\u0438");
         loginButton.gameObject.name = "LoginButton";
+        EnsureGuestButton();
         switchToRegisterButton = CreateButton(loginPanel.transform, "\u041f\u0435\u0440\u0435\u0439\u0442\u0438 \u043a \u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0430\u0446\u0438\u0438");
         switchToRegisterButton.gameObject.name = "SwitchToRegisterButton";
 
@@ -563,6 +588,21 @@ public class AuthUIController : MonoBehaviour
         statusText.alignment = TextAlignmentOptions.Center;
     }
 
+    private void EnsureGuestButton()
+    {
+        if (guestButton != null || loginPanel == null)
+        {
+            return;
+        }
+
+        guestButton = CreateButton(loginPanel.transform, "\u0412\u043e\u0439\u0442\u0438 \u043a\u0430\u043a \u0433\u043e\u0441\u0442\u044c");
+        guestButton.gameObject.name = "GuestButton";
+        if (loginButton != null)
+        {
+            guestButton.transform.SetSiblingIndex(loginButton.transform.GetSiblingIndex() + 1);
+        }
+    }
+
     private void FindExistingUiReferences()
     {
         loginPanel = GameObject.Find("LoginPanel");
@@ -575,6 +615,7 @@ public class AuthUIController : MonoBehaviour
         displayNameInput ??= FindInput(registerPanel, "Display Name") ?? GameObject.Find("Display Name")?.GetComponent<TMP_InputField>();
         statusText ??= GameObject.Find("AuthStatusText")?.GetComponent<TextMeshProUGUI>();
         loginButton ??= GameObject.Find("LoginButton")?.GetComponent<Button>();
+        guestButton ??= GameObject.Find("GuestButton")?.GetComponent<Button>();
         registerButton ??= GameObject.Find("RegisterButton")?.GetComponent<Button>();
         switchToRegisterButton ??= GameObject.Find("SwitchToRegisterButton")?.GetComponent<Button>();
         switchToLoginButton ??= GameObject.Find("SwitchToLoginButton")?.GetComponent<Button>();

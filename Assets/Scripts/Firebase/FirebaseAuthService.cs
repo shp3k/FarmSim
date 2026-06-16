@@ -22,6 +22,9 @@ public class FirebaseAuthService : MonoBehaviour
     private const string FallbackIdTokenKey = "farmsim_firebase_rest_id_token";
     private const string FallbackRefreshTokenKey = "farmsim_firebase_rest_refresh_token";
     private const string FallbackTokenExpiresAtKey = "farmsim_firebase_rest_token_expires_at";
+    private const string GuestSessionKey = "farmsim_guest_session_active";
+    private const string GuestUserId = "guest";
+    private const string GuestDisplayName = "Guest";
 
     private string fallbackUserId;
     private string fallbackEmail;
@@ -29,6 +32,9 @@ public class FirebaseAuthService : MonoBehaviour
     private string fallbackIdToken;
     private string fallbackRefreshToken;
     private long fallbackTokenExpiresAtUnix;
+    private bool isGuestSession;
+
+    public bool IsGuestSession => isGuestSession;
 
     private void Awake()
     {
@@ -37,6 +43,11 @@ public class FirebaseAuthService : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
             LoadFallbackSession();
+            LoadGuestSession();
+            if (HasRestSession())
+            {
+                ClearGuestSession();
+            }
         }
         else if (Instance != this)
         {
@@ -46,6 +57,12 @@ public class FirebaseAuthService : MonoBehaviour
 
     public async Task<bool> InitializeAuth()
     {
+        if (isGuestSession)
+        {
+            await Task.Yield();
+            return true;
+        }
+
 #if FARMSIM_FIREBASE && (UNITY_STANDALONE || UNITY_EDITOR)
         if (!string.IsNullOrEmpty(fallbackUserId))
         {
@@ -197,6 +214,20 @@ public class FirebaseAuthService : MonoBehaviour
         auth?.SignOut();
 #endif
         ClearFallbackSession();
+        ClearGuestSession();
+    }
+
+    public AuthResultData LoginAsGuest()
+    {
+#if FARMSIM_FIREBASE
+        auth ??= FirebaseAuth.DefaultInstance;
+        auth?.SignOut();
+#endif
+        ClearFallbackSession();
+        isGuestSession = true;
+        PlayerPrefs.SetInt(GuestSessionKey, 1);
+        PlayerPrefs.Save();
+        return AuthResultData.Ok(GuestUserId);
     }
 
     public bool IsSignedIn()
@@ -209,8 +240,18 @@ public class FirebaseAuthService : MonoBehaviour
 #endif
     }
 
+    public bool HasActiveSession()
+    {
+        return isGuestSession || IsSignedIn();
+    }
+
     public string GetUserId()
     {
+        if (isGuestSession)
+        {
+            return GuestUserId;
+        }
+
         if (!string.IsNullOrEmpty(fallbackUserId))
         {
             return fallbackUserId;
@@ -226,6 +267,11 @@ public class FirebaseAuthService : MonoBehaviour
 
     public string GetUserEmail()
     {
+        if (isGuestSession)
+        {
+            return string.Empty;
+        }
+
         if (!string.IsNullOrEmpty(fallbackEmail))
         {
             return fallbackEmail;
@@ -241,6 +287,11 @@ public class FirebaseAuthService : MonoBehaviour
 
     public string GetDisplayName()
     {
+        if (isGuestSession)
+        {
+            return GuestDisplayName;
+        }
+
         if (!string.IsNullOrEmpty(fallbackDisplayName))
         {
             return fallbackDisplayName;
@@ -515,6 +566,7 @@ public class FirebaseAuthService : MonoBehaviour
 
     private void SaveFallbackSession(string userId, string email, string displayName, string idToken, string refreshToken, int expiresInSeconds)
     {
+        ClearGuestSession();
         fallbackUserId = userId ?? string.Empty;
         fallbackEmail = email ?? string.Empty;
         fallbackDisplayName = string.IsNullOrWhiteSpace(displayName) ? "Player" : displayName.Trim();
@@ -547,6 +599,11 @@ public class FirebaseAuthService : MonoBehaviour
         }
     }
 
+    private void LoadGuestSession()
+    {
+        isGuestSession = PlayerPrefs.GetInt(GuestSessionKey, 0) == 1;
+    }
+
     private void ClearFallbackSession()
     {
         fallbackUserId = string.Empty;
@@ -561,6 +618,13 @@ public class FirebaseAuthService : MonoBehaviour
         PlayerPrefs.DeleteKey(FallbackIdTokenKey);
         PlayerPrefs.DeleteKey(FallbackRefreshTokenKey);
         PlayerPrefs.DeleteKey(FallbackTokenExpiresAtKey);
+        PlayerPrefs.Save();
+    }
+
+    private void ClearGuestSession()
+    {
+        isGuestSession = false;
+        PlayerPrefs.DeleteKey(GuestSessionKey);
         PlayerPrefs.Save();
     }
 

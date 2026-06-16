@@ -25,7 +25,7 @@ public class GameSceneAuthGuard : MonoBehaviour
         }
 
         await authService.InitializeAuth();
-        if (!authService.IsSignedIn())
+        if (!authService.HasActiveSession())
         {
             Debug.LogWarning("GameSceneAuthGuard: user is not signed in. Returning to AuthScene.");
             SceneTransitionManager.LoadScene(authSceneName);
